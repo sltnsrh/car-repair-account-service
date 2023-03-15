@@ -1,4 +1,4 @@
-package com.salatin.backresources;
+package com.salatin.account;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

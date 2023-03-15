@@ -1,4 +1,4 @@
-package com.salatin.backresources.controller;
+package com.salatin.account.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

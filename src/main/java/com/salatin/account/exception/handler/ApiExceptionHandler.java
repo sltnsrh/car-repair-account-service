@@ -1,5 +1,6 @@
-package com.salatin.account.exception;
+package com.salatin.account.exception.handler;
 
+import com.salatin.account.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

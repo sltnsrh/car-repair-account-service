@@ -1,6 +1,5 @@
 package com.salatin.account.service.impl;
 
-import com.salatin.account.exception.ExceptionResponse;
 import com.salatin.account.exception.UserAlreadyExistsException;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
 import com.salatin.account.service.UserService;
@@ -20,10 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service

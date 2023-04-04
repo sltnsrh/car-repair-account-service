@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     private String ADMIN_PASSWORD;
     @Value("${admin.client.id}")
     private String ADMIN_CLIENT_ID;
-    @Value("${keycloak.host}")
+    @Value("${keycloak.host.url}")
     private String KEYCLOAK_HOST;
     @Value("${realm.name}")
     private String REALM_NAME;

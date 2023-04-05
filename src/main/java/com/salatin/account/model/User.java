@@ -21,4 +21,6 @@ public class User {
     private String mobile;
     private List<Car> cars = new ArrayList<>();
     private UserRole role;
+    private Long createdTimeStamp;
+    private Boolean enabled;
 }

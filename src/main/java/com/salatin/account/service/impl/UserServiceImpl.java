@@ -1,7 +1,9 @@
 package com.salatin.account.service.impl;
 
 import com.salatin.account.exception.UserAlreadyExistsException;
+import com.salatin.account.model.User;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
+import com.salatin.account.repository.UserRepository;
 import com.salatin.account.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +29,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private static final String MOBILE_ATTRIBUTE = "mobile";
-    private static final String CREATE_USER_URI = "/admin/realms/%s/users";
+    private static final String CREATE_USER_URI = "/admin/realms/{realm}/users";
 
     private final WebClient webClient = WebClient.create();
+    private final UserRepository userRepository;
 
     @Value("${admin.username}")
     private String ADMIN_USERNAME;
@@ -44,11 +47,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void create(RegistrationRequestDto userDto) {
+
         String token = authAdmin();
+        HttpStatus status = registerOnAuthServer(userDto, token);
+
+        assert status != null;
+        if (status.value() != HttpStatus.CREATED.value()) {
+            throw new RuntimeException("Can't register a new user. Response status is: "
+                + status.value());
+        }
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElse(null);
+    }
+
+    @Override
+    public User findByPhoneNumber(String mobile) {
+        return userRepository.findUserByMobile(mobile).orElse(null);
+    }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    private HttpStatus registerOnAuthServer(RegistrationRequestDto userDto, String token) {
+
         UserRepresentation user = createUserRepresentation(userDto);
 
         Mono<HttpStatus> response = webClient.post()
-            .uri(String.format(KEYCLOAK_HOST + CREATE_USER_URI, REALM_NAME))
+            .uri(KEYCLOAK_HOST + CREATE_USER_URI, REALM_NAME)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(user)
             .headers(headers -> {
@@ -57,18 +87,12 @@ public class UserServiceImpl implements UserService {
             .retrieve()
             .onStatus(HttpStatus.CONFLICT::equals, clientResponse
                 -> Mono.error(new UserAlreadyExistsException(
-                    String.format("User %s is already registered", userDto.getEmail())
+                String.format("User %s is already registered", userDto.getEmail())
             )))
             .toBodilessEntity()
             .map(responseEntity -> (HttpStatus) responseEntity.getStatusCode());
 
-        HttpStatus status = response.block();
-
-        assert status != null;
-        if (status.value() != HttpStatus.CREATED.value()) {
-            throw new RuntimeException("Can't register a new user. Response status is: "
-                + status.value());
-        }
+       return response.block();
     }
 
     private String authAdmin() {

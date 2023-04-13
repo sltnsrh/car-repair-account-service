@@ -6,8 +6,6 @@ import com.salatin.account.model.dto.request.RegistrationRequestDto;
 public interface UserService {
     void create(RegistrationRequestDto userDto);
 
-    User save(User user);
-
     User findByEmail(String email);
 
     User findByPhoneNumber(String phoneNumber);

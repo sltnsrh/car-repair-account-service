@@ -68,11 +68,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findUserByMobile(mobile).orElse(null);
     }
 
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
     private HttpStatus registerOnAuthServer(RegistrationRequestDto userDto, String token) {
 
         UserRepresentation user = createUserRepresentation(userDto);

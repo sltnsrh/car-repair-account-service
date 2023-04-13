@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegistrationController {
     private final UserService userService;
 
-
     @GetMapping("/res")
     public String resource() {
         return "Here your resource";

@@ -15,9 +15,9 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests().requestMatchers("/register").permitAll()
             .and()
-            .securityMatcher("/**")
+            .securityMatcher("/register")
             .authorizeHttpRequests()
-            .requestMatchers("/**").hasAuthority("SCOPE_message.read")
+            .anyRequest().hasRole("CUSTOMER")
             .and()
             .oauth2ResourceServer()
             .jwt();

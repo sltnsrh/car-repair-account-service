@@ -5,7 +5,6 @@ import com.salatin.account.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +20,6 @@ public class RegistrationController {
     @GetMapping("/res")
     public String resource() {
         return "Here your resource";
-    }
-
-    @GetMapping("/res2")
-    public ResponseEntity<String> resource2() {
-        return new ResponseEntity<>("your response", HttpStatus.OK);
     }
 
     @PostMapping(value = "/register")

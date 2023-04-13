@@ -1,7 +1,7 @@
 package com.salatin.account.service.impl;
 
 import com.salatin.account.exception.UserAlreadyExistsException;
-import com.salatin.account.model.User;
+import com.salatin.account.model.dto.User;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
 import com.salatin.account.repository.UserRepository;
 import com.salatin.account.service.UserService;

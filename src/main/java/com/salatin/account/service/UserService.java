@@ -1,6 +1,6 @@
 package com.salatin.account.service;
 
-import com.salatin.account.model.User;
+import com.salatin.account.model.dto.User;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
 
 public interface UserService {

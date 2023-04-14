@@ -3,7 +3,6 @@ package com.salatin.account.service.impl;
 import com.salatin.account.exception.UserAlreadyExistsException;
 import com.salatin.account.model.dto.User;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
-import com.salatin.account.repository.UserRepository;
 import com.salatin.account.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +32,6 @@ public class UserServiceImpl implements UserService {
     private static final String CREATE_USER_URI = "/admin/realms/{realm}/users";
 
     private final WebClient webClient = WebClient.create();
-    private final UserRepository userRepository;
 
     @Value("${admin.username}")
     private String ADMIN_USERNAME;
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
     private String REALM_NAME;
 
     @Override
-    public void create(RegistrationRequestDto userDto) {
+    public Mono<User> create(RegistrationRequestDto userDto) {
 
         String token = authAdmin();
         HttpStatus status = registerOnAuthServer(userDto, token);
@@ -56,16 +55,28 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Can't register a new user. Response status is: "
                 + status.value());
         }
+
+        return findByEmail(userDto.getEmail());
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElse(null);
+    public Mono<User> findByEmail(String email) {
+        String token = authAdmin();
+
+        return webClient.post()
+            .uri(uriBuilder -> uriBuilder.host(KEYCLOAK_HOST)
+                .path("/admin/realms/car-repair-realm/users")
+                .queryParam("username", "some@email.com")
+                .build())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<User>>() {})
+            .map(users -> users.get(0));
     }
 
     @Override
     public User findByPhoneNumber(String mobile) {
-        return userRepository.findUserByMobile(mobile).orElse(null);
+        return null;
     }
 
     private HttpStatus registerOnAuthServer(RegistrationRequestDto userDto, String token) {

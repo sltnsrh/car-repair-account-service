@@ -1,5 +1,6 @@
 package com.salatin.account.model.dto.response;
 
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
@@ -13,6 +14,6 @@ public class UserResponseDto {
     private Boolean emailVerified;
     private String firstName;
     private String lastName;
-    private Map<String, String> attributes;
+    private Map<String, List<String>> attributes;
     private Map<String, Boolean> access;
 }

@@ -26,18 +26,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRepresentation create(RegistrationRequestDto userDto) {
-
         UserRepresentation user = createUserRepresentation(userDto);
-        Response createUserResponse = usersResource.create(user);
 
-        if (createUserResponse != null
-            && createUserResponse.getStatus() == HttpStatus.CONFLICT.value()) {
-            throw new UserAlreadyExistsException("Can't register a new user. Email is already exists");
+        try (Response createUserResponse = usersResource.create(user)) {
+
+            if (createUserResponse != null
+                && createUserResponse.getStatus() == HttpStatus.CONFLICT.value()) {
+                throw new UserAlreadyExistsException(
+                    "Can't register a new user. Email is already exists");
+            }
         }
 
-        UserRepresentation savedUser = findByEmail(userDto.getEmail());
-
-        return savedUser;
+        return findByEmail(userDto.getEmail());
     }
 
     @Override

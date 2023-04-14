@@ -9,19 +9,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -32,13 +28,8 @@ public class UserServiceImpl implements UserService {
     private static final String CREATE_USER_URI = "/admin/realms/{realm}/users";
 
     private final WebClient webClient = WebClient.create();
+    private final AuthAdminService authAdminService;
 
-    @Value("${admin.username}")
-    private String ADMIN_USERNAME;
-    @Value("${admin.password}")
-    private String ADMIN_PASSWORD;
-    @Value("${admin.client.id}")
-    private String ADMIN_CLIENT_ID;
     @Value("${keycloak.host.url}")
     private String KEYCLOAK_HOST;
     @Value("${realm.name}")
@@ -47,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<User> create(RegistrationRequestDto userDto) {
 
-        String token = authAdmin();
+        String token = authAdminService.authAndGetJwt();
         HttpStatus status = registerOnAuthServer(userDto, token);
 
         assert status != null;
@@ -61,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> findByEmail(String email) {
-        String token = authAdmin();
+        String token = authAdminService.authAndGetJwt();
 
         return webClient.post()
             .uri(uriBuilder -> uriBuilder.host(KEYCLOAK_HOST)
@@ -101,22 +92,7 @@ public class UserServiceImpl implements UserService {
        return response.block();
     }
 
-    private String authAdmin() {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "password");
-        formData.add("username", ADMIN_USERNAME);
-        formData.add("password", ADMIN_PASSWORD);
-        formData.add("client_id", ADMIN_CLIENT_ID);
 
-        return Objects.requireNonNull(webClient.post()
-                .uri("http://localhost:8083/realms/car-repair-realm/protocol/openid-connect/token")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(BodyInserters.fromFormData(formData))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block())
-            .get("access_token").toString();
-    }
 
     private UserRepresentation createUserRepresentation(RegistrationRequestDto userDto) {
         UserRepresentation user = new UserRepresentation();

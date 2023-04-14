@@ -1,3 +1,5 @@
 package com.salatin.account.exception.handler;
 
-public record ExceptionResponse (String message) {}
+import org.springframework.http.HttpStatus;
+
+public record ExceptionResponse (String message, String timeStamp, HttpStatus status) {}

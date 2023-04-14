@@ -1,10 +1,10 @@
-package com.salatin.account.model.dto;
+package com.salatin.account.model.dto.response;
 
 import java.util.Map;
 import lombok.Data;
 
 @Data
-public class User {
+public class UserResponseDto {
     private String id;
     private Long createdTimestamp;
     private String email;

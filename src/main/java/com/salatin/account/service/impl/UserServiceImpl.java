@@ -30,6 +30,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserRepresentation findById(String id) {
+        return usersResource.get(id).toRepresentation();
+    }
+
+    @Override
     public UserRepresentation findByEmail(String email) {
         return usersResource.search(email).get(0);
     }

@@ -6,6 +6,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 public interface UserService {
     UserRepresentation create(RegistrationRequestDto userDto);
 
+    UserRepresentation findById(String id);
+
     UserRepresentation findByEmail(String email);
 
     UserRepresentation findByPhoneNumber(String phoneNumber);

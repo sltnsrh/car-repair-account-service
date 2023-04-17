@@ -2,7 +2,6 @@ package com.salatin.account.service.impl;
 
 import com.salatin.account.exception.UserAlreadyExistsException;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
-import com.salatin.account.model.dto.response.UserResponseDto;
 import com.salatin.account.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserResponseDto findByPhoneNumber(String mobile) {
+    public UserRepresentation findByPhoneNumber(String mobile) {
         return null;
     }
 

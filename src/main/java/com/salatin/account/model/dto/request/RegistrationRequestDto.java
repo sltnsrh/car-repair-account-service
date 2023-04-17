@@ -4,7 +4,6 @@ import com.salatin.account.validation.FieldsValueMatch;
 import com.salatin.account.validation.ValidEmail;
 import com.salatin.account.validation.ValidMobile;
 import com.salatin.account.validation.ValidPassword;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,9 +26,7 @@ public class RegistrationRequestDto {
     private String lastName;
     @ValidPassword
     private String password;
-    @NotBlank(message = "Confirmation password field must not be empty")
     private String repeatPassword;
     @ValidMobile
     private String mobile;
-    private String role;
 }

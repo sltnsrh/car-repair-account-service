@@ -16,4 +16,5 @@ public class UserResponseDto {
     private String lastName;
     private Map<String, List<String>> attributes;
     private Map<String, Boolean> access;
+    private List<String> roles;
 }

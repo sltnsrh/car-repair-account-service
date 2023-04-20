@@ -11,6 +11,10 @@ public class MobileValidator implements ConstraintValidator<ValidMobile, String>
 
     @Override
     public boolean isValid(String mobile, ConstraintValidatorContext constraintValidatorContext) {
+        if (mobile == null) {
+            throw new IllegalArgumentException("Phone number field can't be null");
+        }
+
         Pattern pattern = Pattern.compile(PATTERN_FOR_UA);
         Matcher matcher = pattern.matcher(mobile);
         return matcher.matches();

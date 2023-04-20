@@ -11,8 +11,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class UserRepresentationMapper {
-    private static final String MOBILE_ATTRIBUTE = "mobile";
+public class UserRepresentationMapper {
+    private static final String MOBILE_ATTRIBUTE = "phoneNumber";
 
     public UserRepresentation toUserRepresentation(RegistrationRequestDto userDto) {
         UserRepresentation user = new UserRepresentation();
@@ -30,7 +30,7 @@ public final class UserRepresentationMapper {
         user.setCredentials(Collections.singletonList(credentials));
 
         Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put(MOBILE_ATTRIBUTE, Collections.singletonList(userDto.getMobile()));
+        attributes.put(MOBILE_ATTRIBUTE, Collections.singletonList(userDto.getPhoneNumber()));
 
         user.setAttributes(attributes);
         user.setCredentials(createCredentials(userDto.getPassword()));

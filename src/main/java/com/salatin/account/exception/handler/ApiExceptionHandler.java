@@ -1,10 +1,14 @@
 package com.salatin.account.exception.handler;
 
-import com.salatin.account.exception.UserAlreadyExistsException;
+import com.salatin.account.exception.EmailAlreadyExistsException;
+import com.salatin.account.exception.MobileNumberAlreadyExistsException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -12,9 +16,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ApiExceptionHandler {
     private final static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-    @ExceptionHandler(value = {UserAlreadyExistsException.class})
+    @ExceptionHandler(value = {
+        EmailAlreadyExistsException.class,
+        MobileNumberAlreadyExistsException.class})
     public ResponseEntity<ExceptionResponse> conflictHandle(RuntimeException e) {
         HttpStatus status = HttpStatus.CONFLICT;
+        return new ResponseEntity<>(getApiExceptionObject(e.getMessage(), status), status);
+    }
+
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+    public ResponseEntity<ExceptionResponse> handleBindingBadRequestException(
+        MethodArgumentNotValidException e
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String errorMessages = e.getBindingResult().getAllErrors().stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .collect(Collectors.joining(", "));
+        return new ResponseEntity<>(getApiExceptionObject(errorMessages, status), status);
+    }
+
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    public ResponseEntity<ExceptionResponse> handleBadRequestException(
+        IllegalArgumentException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(getApiExceptionObject(e.getMessage(), status), status);
     }
 

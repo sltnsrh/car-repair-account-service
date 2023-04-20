@@ -15,6 +15,10 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
+        if (password == null) {
+            throw new IllegalArgumentException("Password field can't be null");
+        }
+
         Pattern pattern = Pattern.compile(PATTERN);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();

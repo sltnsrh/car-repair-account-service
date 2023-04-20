@@ -1,7 +1,7 @@
 package com.salatin.account.exception;
 
-public class UserAlreadyExistsException extends RuntimeException {
-    public UserAlreadyExistsException(String message) {
+public class EmailAlreadyExistsException extends RuntimeException {
+    public EmailAlreadyExistsException(String message) {
         super(message);
     }
 }

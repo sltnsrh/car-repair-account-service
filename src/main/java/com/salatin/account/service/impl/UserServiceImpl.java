@@ -41,7 +41,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRepresentation findByPhoneNumber(String mobile) {
-        return usersResource.searchByAttributes(mobile).get(0);
+        var userRepresentations = usersResource
+            .searchByAttributes("phoneNumber:" + mobile);
+
+        return userRepresentations.isEmpty() ? null : userRepresentations.get(0);
     }
 
     private void checkIfMobileAlreadyExists(String mobile) {

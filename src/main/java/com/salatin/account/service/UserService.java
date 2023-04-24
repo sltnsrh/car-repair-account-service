@@ -1,11 +1,12 @@
 package com.salatin.account.service;
 
 import org.keycloak.representations.idm.UserRepresentation;
+import reactor.core.publisher.Mono;
 
 public interface UserService {
 
     UserRepresentation save(UserRepresentation userRepresentation);
-    UserRepresentation findById(String id);
+    Mono<UserRepresentation> findById(String id);
 
     UserRepresentation findByEmail(String email);
 

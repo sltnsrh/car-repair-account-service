@@ -16,7 +16,6 @@ public interface UserMapper {
         expression = "java(getUserRoles(userRepresentation.getId(), usersResource))")
     UserResponseDto toDto(UserRepresentation userRepresentation, UsersResource usersResource);
 
-
     @Named("getUserRoles")
     default List<String> getUserRoles(String id, UsersResource usersResource) {
         return usersResource.get(id).roles().realmLevel().listEffective().stream()

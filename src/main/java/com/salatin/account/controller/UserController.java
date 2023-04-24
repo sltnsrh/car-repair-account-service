@@ -6,11 +6,12 @@ import com.salatin.account.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/users")
@@ -21,11 +22,10 @@ public class UserController {
     private final UsersResource usersResource;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getInfo(@PathVariable String id) {
+    @ResponseStatus(value = HttpStatus.OK)
+    public Mono<UserResponseDto> getInfo(@PathVariable String id) {
 
-        return new ResponseEntity<>(
-            userMapper.toDto(
-                userService.findById(id), usersResource),
-            HttpStatus.OK);
+        return userService.findById(id)
+            .map(userRepresentation -> userMapper.toDto(userRepresentation, usersResource));
     }
 }

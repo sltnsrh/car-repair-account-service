@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final static String PHONE_ATTRIBUTE = "phoneNumber:";
+
     private final UsersResource usersResource;
 
     @Override
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRepresentation findByPhoneNumber(String mobile) {
         var userRepresentations = usersResource
-            .searchByAttributes("phoneNumber:" + mobile);
+            .searchByAttributes(PHONE_ATTRIBUTE + mobile);
 
         return userRepresentations.isEmpty() ? null : userRepresentations.get(0);
     }

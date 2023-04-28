@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
         try (Response ignored = usersResource.create(userRepresentation)) {
 
-            return Mono.just(usersResource.search(userRepresentation.getEmail()).get(0));
+            return Mono.just(usersResource.search(userRepresentation.getEmail()).get(0)).log();
         }
     }
 
@@ -36,21 +36,23 @@ public class UserServiceImpl implements UserService {
         return Mono.fromCallable(() -> usersResource.get(id).toRepresentation())
             .onErrorResume(NotFoundException.class, ex ->
                 Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT,
-                    "Can't find a user with id: " + id)));
+                    "Can't find a user with id: " + id))).log();
     }
 
     @Override
     public Mono<UserRepresentation> findByEmail(String email) {
+        log.info(() -> "Looking for a user with email: " + email);
         var userRepresentations = usersResource.search(email);
 
-        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0));
+        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0)).log();
     }
 
     @Override
     public Mono<UserRepresentation> findByPhoneNumber(String mobile) {
+        log.info(() -> "Looking for a user with mobile: " + mobile);
         var userRepresentations = usersResource
             .searchByAttributes(PHONE_ATTRIBUTE + mobile);
 
-        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0));
+        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0)).log();
     }
 }

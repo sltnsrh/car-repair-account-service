@@ -8,7 +8,7 @@ public interface UserService {
     Mono<UserRepresentation> save(UserRepresentation userRepresentation);
     Mono<UserRepresentation> findById(String id);
 
-    UserRepresentation findByEmail(String email);
+    Mono<UserRepresentation> findByEmail(String email);
 
-    UserRepresentation findByPhoneNumber(String phoneNumber);
+    Mono<UserRepresentation> findByPhoneNumber(String phoneNumber);
 }

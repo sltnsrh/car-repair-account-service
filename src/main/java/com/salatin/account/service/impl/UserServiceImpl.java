@@ -40,17 +40,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRepresentation findByEmail(String email) {
+    public Mono<UserRepresentation> findByEmail(String email) {
         var userRepresentations = usersResource.search(email);
 
-        return userRepresentations.isEmpty() ? null : userRepresentations.get(0);
+        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0));
     }
 
     @Override
-    public UserRepresentation findByPhoneNumber(String mobile) {
+    public Mono<UserRepresentation> findByPhoneNumber(String mobile) {
         var userRepresentations = usersResource
             .searchByAttributes(PHONE_ATTRIBUTE + mobile);
 
-        return userRepresentations.isEmpty() ? null : userRepresentations.get(0);
+        return userRepresentations.isEmpty() ? null : Mono.just(userRepresentations.get(0));
     }
 }

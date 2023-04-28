@@ -16,6 +16,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ class AuthServiceImplTest {
     @Test
     void registerWhenMobileExistsThenTrowException() {
         when(userService.findByPhoneNumber(MOBILE_TEST))
-                .thenReturn(new UserRepresentation());
+                .thenReturn(Mono.just(new UserRepresentation()));
 
         assertThrows(MobileNumberAlreadyExistsException.class,
             () -> authService.register(createRegistrationDto()));
@@ -42,7 +43,7 @@ class AuthServiceImplTest {
     @Test
     void registerWhenEmailExistsThenTrowException() {
         when(userService.findByPhoneNumber(MOBILE_TEST)).thenReturn(null);
-        when(userService.findByEmail(EMAIL_TEST)).thenReturn(new UserRepresentation());
+        when(userService.findByEmail(EMAIL_TEST)).thenReturn(Mono.just(new UserRepresentation()));
 
         assertThrows(EmailAlreadyExistsException.class,
             () -> authService.register(createRegistrationDto()));
@@ -54,7 +55,7 @@ class AuthServiceImplTest {
         var registrationDto = createRegistrationDto();
 
         when(mapper.toUserRepresentation(registrationDto)).thenReturn(userRepresentation);
-        when(userService.save(userRepresentation)).thenReturn(userRepresentation);
+        when(userService.save(userRepresentation)).thenReturn(Mono.just(userRepresentation));
         when(userService.findByPhoneNumber(MOBILE_TEST)).thenReturn(null);
         when(userService.findByEmail(EMAIL_TEST)).thenReturn(null);
 

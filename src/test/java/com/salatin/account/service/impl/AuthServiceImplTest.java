@@ -1,7 +1,5 @@
 package com.salatin.account.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.salatin.account.exception.EmailAlreadyExistsException;
@@ -17,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @RequiredArgsConstructor
@@ -34,10 +33,11 @@ class AuthServiceImplTest {
     @Test
     void registerWhenMobileExistsThenTrowException() {
         when(userService.findByPhoneNumber(MOBILE_TEST))
-                .thenReturn(Mono.just(new UserRepresentation()));
+            .thenReturn(Mono.just(new UserRepresentation()));
 
-        assertThrows(MobileNumberAlreadyExistsException.class,
-            () -> authService.register(createRegistrationDto()));
+        StepVerifier.create(authService.register(createRegistrationDto()))
+            .expectError(MobileNumberAlreadyExistsException.class)
+            .verify();
     }
 
     @Test
@@ -45,8 +45,9 @@ class AuthServiceImplTest {
         when(userService.findByPhoneNumber(MOBILE_TEST)).thenReturn(null);
         when(userService.findByEmail(EMAIL_TEST)).thenReturn(Mono.just(new UserRepresentation()));
 
-        assertThrows(EmailAlreadyExistsException.class,
-            () -> authService.register(createRegistrationDto()));
+        StepVerifier.create(authService.register(createRegistrationDto()))
+            .expectError(EmailAlreadyExistsException.class)
+            .verify();
     }
 
     @Test
@@ -59,7 +60,9 @@ class AuthServiceImplTest {
         when(userService.findByPhoneNumber(MOBILE_TEST)).thenReturn(null);
         when(userService.findByEmail(EMAIL_TEST)).thenReturn(null);
 
-        assertNotNull(authService.register(registrationDto));
+        StepVerifier.create(authService.register(registrationDto))
+            .expectNextCount(1)
+            .verifyComplete();
     }
 
     private RegistrationRequestDto createRegistrationDto() {

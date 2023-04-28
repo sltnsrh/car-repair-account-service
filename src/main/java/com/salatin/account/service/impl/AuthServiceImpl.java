@@ -20,27 +20,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Mono<UserRepresentation> register(RegistrationRequestDto requestDto) {
-        checkIfMobileAlreadyExists(requestDto.getPhoneNumber());
-        checkIfEmailAlreadyExists(requestDto.getEmail());
+        var phoneNumber = requestDto.getPhoneNumber();
 
-        UserRepresentation user = userRepresentationMapper.toUserRepresentation(requestDto);
+        if (mobileAlreadyExists(phoneNumber))
+            return Mono.error(new MobileNumberAlreadyExistsException(
+            "Phone number is already exists: " + phoneNumber));
+
+        var email = requestDto.getEmail();
+
+        if(emailAlreadyExists(email))
+            return Mono.error(new EmailAlreadyExistsException(
+                "Email is already exists: " + email));
+
+        var user = userRepresentationMapper.toUserRepresentation(requestDto);
 
         return userService.save(user);
     }
 
-    private void checkIfMobileAlreadyExists(String mobile) {
+    private boolean mobileAlreadyExists(String mobile) {
 
-        if (userService.findByPhoneNumber(mobile) != null) {
-            throw new MobileNumberAlreadyExistsException(
-                "Phone number is already exists: " + mobile);
-        }
+        return userService.findByPhoneNumber(mobile) != null;
     }
 
-    private void checkIfEmailAlreadyExists(String email) {
+    private boolean emailAlreadyExists(String email) {
 
-        if (userService.findByEmail(email) != null) {
-            throw new EmailAlreadyExistsException(
-                "Can't register a new user. Email is already exists");
-        }
+        return userService.findByEmail(email) != null;
     }
 }

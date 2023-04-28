@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserRepresentation user = userRepresentationMapper.toUserRepresentation(requestDto);
 
-        return Mono.just(userService.save(user));
+        return userService.save(user);
     }
 
     private void checkIfMobileAlreadyExists(String mobile) {

@@ -21,11 +21,11 @@ public class UserServiceImpl implements UserService {
     private final UsersResource usersResource;
 
     @Override
-    public UserRepresentation save(UserRepresentation userRepresentation) {
+    public Mono<UserRepresentation> save(UserRepresentation userRepresentation) {
 
         try (Response ignored = usersResource.create(userRepresentation)) {
 
-            return usersResource.search(userRepresentation.getEmail()).get(0);
+            return Mono.just(usersResource.search(userRepresentation.getEmail()).get(0));
         }
     }
 

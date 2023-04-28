@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
 
-    UserRepresentation save(UserRepresentation userRepresentation);
+    Mono<UserRepresentation> save(UserRepresentation userRepresentation);
     Mono<UserRepresentation> findById(String id);
 
     UserRepresentation findByEmail(String email);

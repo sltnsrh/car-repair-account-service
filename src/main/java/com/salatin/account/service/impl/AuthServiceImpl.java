@@ -9,6 +9,7 @@ import com.salatin.account.service.mapper.UserRepresentationMapper;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +19,13 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public UserRepresentation register(RegistrationRequestDto requestDto) {
+    public Mono<UserRepresentation> register(RegistrationRequestDto requestDto) {
         checkIfMobileAlreadyExists(requestDto.getPhoneNumber());
         checkIfEmailAlreadyExists(requestDto.getEmail());
 
         UserRepresentation user = userRepresentationMapper.toUserRepresentation(requestDto);
 
-        return userService.save(user);
+        return Mono.just(userService.save(user));
     }
 
     private void checkIfMobileAlreadyExists(String mobile) {

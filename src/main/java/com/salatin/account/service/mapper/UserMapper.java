@@ -8,6 +8,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -21,5 +22,12 @@ public interface UserMapper {
         return usersResource.get(id).roles().realmLevel().listEffective().stream()
             .map(RoleRepresentation::getName)
             .toList();
+    }
+
+    default Mono<UserResponseDto> toMonoDto(Mono<UserRepresentation> userRepresentation,
+                                            UsersResource usersResource) {
+
+        return userRepresentation
+            .flatMap(ur -> Mono.just(this.toDto(ur, usersResource)));
     }
 }

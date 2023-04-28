@@ -8,10 +8,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +22,10 @@ public class RegistrationController {
     private final UsersResource usersResource;
 
     @PostMapping(value = "/register")
-    public ResponseEntity<UserResponseDto> register(
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public Mono<UserResponseDto> register(
         @Valid @RequestBody RegistrationRequestDto request) {
 
-        return new ResponseEntity<>(userMapper.toDto(authService.register(request), usersResource),
-            HttpStatus.CREATED);
+        return userMapper.toMonoDto(authService.register(request), usersResource);
     }
 }

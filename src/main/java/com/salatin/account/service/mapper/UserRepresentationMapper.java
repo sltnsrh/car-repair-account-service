@@ -21,21 +21,16 @@ public class UserRepresentationMapper {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setEnabled(true);
-
-        CredentialRepresentation credentials = new CredentialRepresentation();
-        credentials.setType(CredentialRepresentation.PASSWORD);
-        credentials.setValue(userDto.getPassword());
-        credentials.setTemporary(false);
-
-        user.setCredentials(Collections.singletonList(credentials));
-
-        Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put(MOBILE_ATTRIBUTE, Collections.singletonList(userDto.getPhoneNumber()));
-
-        user.setAttributes(attributes);
+        user.setAttributes(getAttributes(userDto.getPhoneNumber()));
         user.setCredentials(createCredentials(userDto.getPassword()));
 
         return user;
+    }
+
+    private Map<String, List<String>> getAttributes(String phoneNumber) {
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put(MOBILE_ATTRIBUTE, Collections.singletonList(phoneNumber));
+        return attributes;
     }
 
     private List<CredentialRepresentation> createCredentials(String password) {

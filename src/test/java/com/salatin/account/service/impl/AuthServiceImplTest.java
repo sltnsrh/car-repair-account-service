@@ -12,6 +12,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -34,7 +35,7 @@ class AuthServiceImplTest {
             .thenReturn(Mono.just(new UserRepresentation()));
 
         StepVerifier.create(authService.register(createRegistrationDto()))
-            .expectError(MobileNumberAlreadyExistsException.class)
+            .expectError(ResponseStatusException.class)
             .verify();
     }
 
@@ -44,7 +45,7 @@ class AuthServiceImplTest {
         when(userService.findByEmail(EMAIL_TEST)).thenReturn(Mono.just(new UserRepresentation()));
 
         StepVerifier.create(authService.register(createRegistrationDto()))
-            .expectError(EmailAlreadyExistsException.class)
+            .expectError(ResponseStatusException.class)
             .verify();
     }
 

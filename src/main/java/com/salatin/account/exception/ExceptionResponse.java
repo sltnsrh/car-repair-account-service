@@ -1,4 +1,4 @@
-package com.salatin.account.exception.handler;
+package com.salatin.account.exception;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,7 +1,5 @@
 package com.salatin.account.exception.handler;
 
-import com.salatin.account.exception.EmailAlreadyExistsException;
-import com.salatin.account.exception.MobileNumberAlreadyExistsException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
@@ -15,14 +13,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ApiExceptionHandler {
     private final static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    @ExceptionHandler(value = {
-        EmailAlreadyExistsException.class,
-        MobileNumberAlreadyExistsException.class})
-    public ResponseEntity<ExceptionResponse> conflictHandle(RuntimeException e) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        return new ResponseEntity<>(getApiExceptionObject(e.getMessage(), status), status);
-    }
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<ExceptionResponse> handleBindingBadRequestException(

@@ -2,8 +2,6 @@ package com.salatin.account.service.impl;
 
 import static org.mockito.Mockito.when;
 
-import com.salatin.account.exception.EmailAlreadyExistsException;
-import com.salatin.account.exception.MobileNumberAlreadyExistsException;
 import com.salatin.account.model.dto.request.RegistrationRequestDto;
 import com.salatin.account.service.UserService;
 import com.salatin.account.service.mapper.UserRepresentationMapper;

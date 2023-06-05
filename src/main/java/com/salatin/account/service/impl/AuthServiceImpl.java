@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    public static final String CUSTOMER_ROLE = "customer";
+
     private final UserService userService;
     private final UserRepresentationMapper userRepresentationMapper;
 
@@ -31,9 +33,13 @@ public class AuthServiceImpl implements AuthService {
             return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT,
                 "Email is already exists: " + email));
 
-        var user = userRepresentationMapper.toUserRepresentation(requestDto);
+        var userRepresentation = userRepresentationMapper.toUserRepresentation(requestDto);
 
-        return userService.save(user);
+        return userService.save(userRepresentation)
+                .map(user -> {
+                    userService.addRole(user.getId(), CUSTOMER_ROLE);
+                    return user;
+                });
     }
 
     private boolean mobileAlreadyExists(String mobile) {

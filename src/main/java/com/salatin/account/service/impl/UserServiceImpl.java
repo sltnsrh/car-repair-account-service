@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
 
         return Mono.fromCallable(() -> usersResource.get(id).toRepresentation())
             .onErrorResume(NotFoundException.class, ex ->
-                Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT,
-                    "Can't find a user with id: " + id))).log();
+                Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Can't find the user with id: " + id))).log();
     }
 
     @Override

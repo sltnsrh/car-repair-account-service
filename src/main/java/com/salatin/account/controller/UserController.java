@@ -32,10 +32,15 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/add-role")
-    @ResponseStatus(value = HttpStatus.OK)
     public Mono<Void> addRoleToUser(@PathVariable String userId,
                               @RequestParam("value") String role) {
 
-        return userService.addRole(userId, role);
+        return userService.addRoleByUserId(userId, role);
+    }
+
+    @PatchMapping("/{userId}/delete-role")
+    public Mono<Void> deleteRoleFromUser(@PathVariable String userId,
+                                         @RequestParam("value") String role) {
+        return userService.deleteRoleByUserId(userId, role);
     }
 }

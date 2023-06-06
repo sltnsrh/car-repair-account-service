@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
@@ -61,14 +62,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<Void> addRole(@NotNull String userId, String role) {
+    public Mono<Void> addRoleByUserId(@NotNull String userId, String role) {
         var userResource = usersResource.get(userId);
 
         try {
-            var userAlreadyHasRole = userResource.roles().realmLevel().listAll().stream()
-                    .anyMatch(r -> r.getName().equals(role));
-
-            if (userAlreadyHasRole) {
+            if (userHasRole(userResource, role)) {
                 return Mono.error(new ResponseStatusException(HttpStatus.ACCEPTED,
                         "User already has role " + role));
             }
@@ -77,16 +75,39 @@ public class UserServiceImpl implements UserService {
                     "Can't find the user with id: " + userId));
         }
 
-        return Mono.defer(() -> {
-            try {
-                var realmRoleToAdd = realmResource.roles().get(role).toRepresentation();
-                userResource.roles().realmLevel().add(Collections.singletonList(realmRoleToAdd));
-                log.info("Role {} was added to the user with id {}", role, userId);
-                return Mono.empty();
-            } catch (NotFoundException e) {
-                return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Can't find the role: " + role));
+        try {
+            var realmRoleToAdd = realmResource.roles().get(role).toRepresentation();
+            userResource.roles().realmLevel().add(Collections.singletonList(realmRoleToAdd));
+            log.info("Role {} was added to the user with id {}", role, userId);
+            return Mono.empty();
+        } catch (NotFoundException e) {
+            return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Can't find the role: " + role));
+        }
+    }
+
+    @Override
+    public Mono<Void> deleteRoleByUserId(String userId, String role) {
+        var userResource = usersResource.get(userId);
+
+        try {
+            if (!userHasRole(userResource, role)) {
+                return Mono.error(new ResponseStatusException(HttpStatus.ACCEPTED,
+                        "User hasn't such a role: " + role));
             }
-        });
+        } catch (NotFoundException e) {
+            return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Can't find the user with id: " + userId));
+        }
+
+        var realmRoleToDelete = realmResource.roles().get(role).toRepresentation();
+        userResource.roles().realmLevel().remove(Collections.singletonList(realmRoleToDelete));
+        log.info("Role {} was deleted from the user with id {}", role, userId);
+        return Mono.empty();
+    }
+
+    private boolean userHasRole(UserResource userResource, String role) {
+        return userResource.roles().realmLevel().listAll().stream()
+                .anyMatch(r -> r.getName().equals(role));
     }
 }

@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
 
         return userService.save(userRepresentation)
                 .map(user -> {
-                    userService.addRole(user.getId(), CUSTOMER_ROLE);
+                    userService.addRoleByUserId(user.getId(), CUSTOMER_ROLE);
                     return user;
                 });
     }

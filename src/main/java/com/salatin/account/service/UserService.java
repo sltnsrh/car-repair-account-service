@@ -12,5 +12,7 @@ public interface UserService {
 
     Mono<UserRepresentation> findByPhoneNumber(String phoneNumber);
 
-    Mono<Void> addRole(String userId, String role);
+    Mono<Void> addRoleByUserId(String userId, String role);
+
+    Mono<Void> deleteRoleByUserId(String userId, String role);
 }

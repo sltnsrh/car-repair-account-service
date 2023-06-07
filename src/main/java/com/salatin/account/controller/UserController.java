@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +27,10 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public Mono<UserResponseDto> getInfo(@PathVariable String id) {
-
-        return userService.findById(id)
+    @PreAuthorize(value = "hasAnyRole('admin', 'manager', 'customer', 'mechanic')")
+    public Mono<UserResponseDto> getInfo(@PathVariable String id,
+                                         JwtAuthenticationToken authentication) {
+        return userService.findInfoById(id, authentication)
             .map(userRepresentation -> userMapper.toDto(userRepresentation, usersResource));
     }
 

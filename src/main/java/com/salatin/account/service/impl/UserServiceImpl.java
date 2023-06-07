@@ -12,6 +12,8 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
@@ -35,13 +37,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<UserRepresentation> findById(String id) {
-        log.info(() -> "Looking for a user with id: " + id);
-
-        return Mono.fromCallable(() -> usersResource.get(id).toRepresentation())
-            .onErrorResume(NotFoundException.class, ex ->
-                Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Can't find the user with id: " + id))).log();
+    public Mono<UserRepresentation> findInfoById(String userId,
+                                                 JwtAuthenticationToken jwtAuthenticationToken) {
+        return checkUserAccess(userId, jwtAuthenticationToken)
+                .then(this.findById(userId));
     }
 
     @Override
@@ -104,6 +103,44 @@ public class UserServiceImpl implements UserService {
         userResource.roles().realmLevel().remove(Collections.singletonList(realmRoleToDelete));
         log.info("Role {} was deleted from the user with id {}", role, userId);
         return Mono.empty();
+    }
+
+    private Mono<Void> checkUserAccess(String requestedUserId, JwtAuthenticationToken authenticationToken) {
+
+        if (isAdminOrManager(authenticationToken)) {
+            return Mono.empty();
+        } else if (isCustomerOrMechanic(authenticationToken)
+                && !authenticationToken.getName().equals(requestedUserId)) {
+
+            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Access denied. You can only retrieve your own information"));
+        }
+        return Mono.empty();
+    }
+
+    private Mono<UserRepresentation> findById(String id) {
+        log.info(() -> "Looking for a user with id: " + id);
+
+        return Mono.fromCallable(() -> usersResource.get(id).toRepresentation())
+                .onErrorResume(NotFoundException.class, ex ->
+                        Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Can't find the user with id: " + id))).log();
+    }
+
+    private boolean isAdminOrManager(JwtAuthenticationToken authenticationToken) {
+        var adminAuthority = new SimpleGrantedAuthority("ROLE_admin");
+        var mechanicAuthority = new SimpleGrantedAuthority("ROLE_manager");
+
+        return authenticationToken.getAuthorities().contains(adminAuthority)
+                || authenticationToken.getAuthorities().contains(mechanicAuthority);
+    }
+
+    private boolean isCustomerOrMechanic(JwtAuthenticationToken authenticationToken) {
+        var customerAuthority = new SimpleGrantedAuthority("ROLE_customer");
+        var mechanicAuthority = new SimpleGrantedAuthority("ROLE_mechanic");
+
+        return authenticationToken.getAuthorities().contains(customerAuthority)
+                || authenticationToken.getAuthorities().contains(mechanicAuthority);
     }
 
     private boolean userHasRole(UserResource userResource, String role) {

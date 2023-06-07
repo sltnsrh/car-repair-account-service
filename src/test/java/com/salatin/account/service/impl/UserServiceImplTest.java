@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,11 +23,15 @@ class UserServiceImplTest {
     private final static String ID = "user-id";
     private final static String PHONE_NUMBER = "+380999998877";
     private final static String PHONE_ATTRIBUTE = "phoneNumber:";
+    private final static SimpleGrantedAuthority ADMIN_AUTHORITY =
+            new SimpleGrantedAuthority("ROLE_admin");
 
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
     private UsersResource usersResource;
+    @Mock
+    private JwtAuthenticationToken authenticationToken;
     private UserRepresentation userRepresentation;
 
     @BeforeEach
@@ -46,13 +52,15 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findByIdWhenValidIdThenReturnUserRepresentation() {
+    void findByIdWhenValidIdAndAdminRequestsThenReturnUserRepresentation() {
         UserResource userResource = mock(UserResource.class);
 
         Mockito.when(usersResource.get(ID)).thenReturn(userResource);
         Mockito.when(userResource.toRepresentation()).thenReturn(userRepresentation);
+        Mockito.when(authenticationToken.getAuthorities())
+                .thenReturn(Collections.singletonList(ADMIN_AUTHORITY));
 
-        StepVerifier.create(userService.findById(ID))
+        StepVerifier.create(userService.findInfoById(ID, authenticationToken))
             .expectNextCount(1)
             .verifyComplete();
     }

@@ -1,12 +1,15 @@
 package com.salatin.account.service;
 
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import reactor.core.publisher.Mono;
 
 public interface UserService {
 
     Mono<UserRepresentation> save(UserRepresentation userRepresentation);
-    Mono<UserRepresentation> findById(String id);
+
+    Mono<UserRepresentation> findInfoById(String userId,
+                                          JwtAuthenticationToken jwtAuthenticationToken);
 
     Mono<UserRepresentation> findByEmail(String email);
 

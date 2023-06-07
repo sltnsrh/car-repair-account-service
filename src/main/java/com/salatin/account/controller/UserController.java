@@ -6,6 +6,7 @@ import com.salatin.account.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,13 +33,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/add-role")
+    @PreAuthorize(value = "hasRole('admin')")
     public Mono<Void> addRoleToUser(@PathVariable String userId,
                               @RequestParam("value") String role) {
-
         return userService.addRoleByUserId(userId, role);
     }
 
     @PatchMapping("/{userId}/delete-role")
+    @PreAuthorize(value = "hasRole('admin')")
     public Mono<Void> deleteRoleFromUser(@PathVariable String userId,
                                          @RequestParam("value") String role) {
         return userService.deleteRoleByUserId(userId, role);
